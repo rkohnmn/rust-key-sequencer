@@ -953,9 +953,33 @@ impl eframe::App for KeySequencerApp {
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
+                    let logo_resp = ui.add(
+                        egui::Image::new(egui::include_image!("../assets/keytape-icon.svg"))
+                            .fit_to_exact_size(egui::vec2(28.0, 28.0))
+                            .rounding(egui::Rounding::same(6.0)),
+                    );
+                    logo_resp.on_hover_ui(|ui| {
+                        ui.add(
+                            egui::Image::new(egui::include_image!("../assets/keytape-logo-dark.svg"))
+                                .fit_to_exact_size(egui::vec2(173.5, 54.0)),
+                        );
+                        ui.label(
+                            egui::RichText::new("Keytape — High-performance Rust Key & Mouse Sequencer")
+                                .small()
+                                .color(egui::Color32::from_rgb(148, 163, 184)),
+                        );
+                    });
+                    ui.add_space(4.0);
+
+                    ui.label(
+                        egui::RichText::new("KEYTAPE")
+                            .size(17.0)
+                            .strong()
+                            .color(egui::Color32::from_rgb(244, 241, 233)),
+                    );
                     ui.label(
                         egui::RichText::new("⚡ KEY & MOUSE SEQUENCER")
-                            .size(17.0)
+                            .size(15.0)
                             .strong()
                             .color(egui::Color32::from_rgb(96, 165, 250)),
                     );
@@ -1455,13 +1479,20 @@ impl eframe::App for KeySequencerApp {
 
             if self.steps.is_empty() {
                 ui.vertical_centered(|ui| {
-                    ui.add_space(36.0);
+                    ui.add_space(28.0);
                     egui::Frame::group(ui.style())
                         .fill(egui::Color32::from_rgb(20, 24, 34))
                         .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(38, 45, 62)))
                         .rounding(egui::Rounding::same(8.0))
                         .inner_margin(egui::Margin::same(24.0))
                         .show(ui, |ui| {
+                            ui.add(
+                                egui::Image::new(egui::include_image!(
+                                    "../assets/keytape-logo-dark.svg"
+                                ))
+                                .fit_to_exact_size(egui::vec2(208.0, 65.0)),
+                            );
+                            ui.add_space(12.0);
                             ui.label(
                                 egui::RichText::new("📋 No steps in sequence queue")
                                     .size(16.0)
@@ -1806,17 +1837,66 @@ impl eframe::App for KeySequencerApp {
     }
 }
 
+fn load_app_icon() -> Option<egui::IconData> {
+    let svg_bytes = include_bytes!("../assets/keytape-icon.svg");
+    let opt = usvg::Options::default();
+    use usvg::TreeParsing;
+    let tree = usvg::Tree::from_data(svg_bytes, &opt).ok()?;
+    let size = tree.size.to_int_size();
+    let mut pixmap = tiny_skia::Pixmap::new(size.width(), size.height())?;
+    let resvg_tree = resvg::Tree::from_usvg(&tree);
+    resvg_tree.render(tiny_skia::Transform::default(), &mut pixmap.as_mut());
+    Some(egui::IconData {
+        rgba: pixmap.take(),
+        width: size.width(),
+        height: size.height(),
+    })
+}
+
 fn main() -> eframe::Result<()> {
+    let mut viewport = egui::ViewportBuilder::default()
+        .with_inner_size([920.0, 680.0])
+        .with_min_inner_size([780.0, 520.0])
+        .with_title("Keytape // Rust Key & Mouse Sequencer");
+
+    if let Some(icon) = load_app_icon() {
+        viewport = viewport.with_icon(icon);
+    }
+
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default()
-            .with_inner_size([920.0, 680.0])
-            .with_min_inner_size([780.0, 520.0])
-            .with_title("Rust Key & Mouse Sequencer"),
+        viewport,
         ..Default::default()
     };
     eframe::run_native(
-        "Rust Key & Mouse Sequencer",
+        "Keytape",
         options,
-        Box::new(|_cc| Ok(Box::new(KeySequencerApp::default()))),
+        Box::new(|cc| {
+            egui_extras::install_image_loaders(&cc.egui_ctx);
+            Ok(Box::new(KeySequencerApp::default()))
+        }),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_load_app_icon() {
+        let icon = load_app_icon().expect("App icon SVG should load and render properly");
+        assert_eq!(icon.width, 96);
+        assert_eq!(icon.height, 96);
+        assert_eq!(icon.rgba.len(), (96 * 96 * 4) as usize);
+    }
+
+    #[test]
+    fn test_assets_exist() {
+        let icon_svg = include_str!("../assets/keytape-icon.svg");
+        let logo_svg = include_str!("../assets/keytape-logo.svg");
+        let logo_dark_svg = include_str!("../assets/keytape-logo-dark.svg");
+
+        assert!(icon_svg.contains("<svg"));
+        assert!(logo_svg.contains("<svg"));
+        assert!(logo_dark_svg.contains("<svg"));
+    }
 }

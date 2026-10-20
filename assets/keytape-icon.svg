@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Keytape app icon</title>
+  <desc id="desc">Angular K with a copper-orange keypress at its center on a charcoal rounded square.</desc>
+  <rect width="96" height="96" rx="19" fill="#18212A"/>
+  <path d="M23 21H36V75H23Z" fill="#F4F1E9"/>
+  <path d="M44 44L62 21H78L53 49Z" fill="#F4F1E9"/>
+  <path d="M44 53L53 44L79 75H62Z" fill="#F4F1E9"/>
+  <rect x="40" y="43" width="14" height="14" rx="2" fill="#DB7955"/>
+</svg>

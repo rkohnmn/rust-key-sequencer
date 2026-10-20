@@ -15,3 +15,7 @@ enigo = "0.2"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rfd = "0.15"
+egui_extras = { version = "0.29", features = ["svg"] }
+resvg = "0.37"
+usvg = "0.37"
+tiny-skia = "0.11"

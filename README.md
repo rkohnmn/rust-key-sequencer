@@ -1,6 +1,13 @@
-# ⚡ Rust Key & Mouse Sequencer
-
 <div align="center">
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/keytape-logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="assets/keytape-logo.svg">
+  <img alt="Keytape — Rust Key & Mouse Sequencer" src="assets/keytape-logo.svg" width="340">
+</picture>
+
+# ⚡ Keytape — Rust Key & Mouse Sequencer
+### Ultra-Fast, Zero-Bloat Keyboard & Mouse Macro Automation Suite
 
 [![Rust Version](https://img.shields.io/badge/rust-2021_edition-DEA584.svg?style=for-the-badge&logo=rust)](https://www.rust-lang.org)
 [![Platform](https://img.shields.io/badge/platform-Windows_10%20%7C%2011-0078D6.svg?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
@@ -14,6 +21,7 @@
 [Quick Start](#-quick-start-in-30-seconds) •
 [Features](#-key-features) •
 [Presets](#-instant-one-click-presets) •
+[Branding](#-branding--assets) •
 [How It Works](#-how-to-use-it-step-by-step) •
 [Build from Source](#-building-from-source) •
 [FAQ](#-troubleshooting--faq)
@@ -219,11 +227,24 @@ This automatically compiles the release executable with Windows subsystem flags 
 
 ---
 
+## 🎨 Branding & Assets
+
+Keytape features a modern, bespoke vector branding suite located in [`assets/`](assets/):
+
+| Asset | Preview | Description |
+| :--- | :---: | :--- |
+| **App Icon**<br>[`assets/keytape-icon.svg`](assets/keytape-icon.svg) | <img src="assets/keytape-icon.svg" width="48" height="48" alt="Keytape App Icon"> | Rounded-square application and OS taskbar icon featuring the signature copper-orange keypress indicator. |
+| **Light Wordmark**<br>[`assets/keytape-logo.svg`](assets/keytape-logo.svg) | <img src="assets/keytape-logo.svg" width="200" alt="Keytape Light Logo"> | Wordmark with charcoal lettering tuned for light documentation and web themes. |
+| **Dark Wordmark**<br>[`assets/keytape-logo-dark.svg`](assets/keytape-logo-dark.svg) | <img src="assets/keytape-logo-dark.svg" width="200" alt="Keytape Dark Logo"> | High-contrast cream wordmark tuned for dark mode GitHub previews and UI headers. |
+
+---
+
 ## 🏗️ Technical Architecture
 
 | Component | Technology | Description |
 | :--- | :--- | :--- |
 | **GUI Framework** | [`egui`](https://github.com/emilk/egui) & [`eframe`](https://docs.rs/eframe) | Immediate-mode GPU-rendered interface running at native 60 FPS. |
+| **Asset Pipeline** | [`egui_extras`](https://docs.rs/egui_extras), [`resvg`](https://docs.rs/resvg), [`usvg`](https://docs.rs/usvg) | Native SVG rendering with theme-aware assets and dynamic window taskbar icon synthesis. |
 | **Input Engine** | [`enigo`](https://github.com/enigo-rs/enigo) | Low-level OS input synthesis simulating hardware keyboard and mouse events. |
 | **Serialization** | [`serde`](https://serde.rs/) & [`serde_json`](https://docs.rs/serde_json) | High-speed JSON serialization for macro export and import. |
 | **File Dialogs** | [`rfd`](https://docs.rs/rfd) | Native Windows File Explorer open/save dialogs. |
