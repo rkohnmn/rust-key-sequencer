@@ -1,0 +1,23 @@
+[
+  {
+    "button": "W",
+    "mode": "Click",
+    "hold_ms": 50,
+    "delay_after_ms": 250,
+    "enabled": true
+  },
+  {
+    "button": "Space",
+    "mode": "Click",
+    "hold_ms": 50,
+    "delay_after_ms": 500,
+    "enabled": true
+  },
+  {
+    "button": "MouseLeft",
+    "mode": "Click",
+    "hold_ms": 50,
+    "delay_after_ms": 250,
+    "enabled": true
+  }
+]
