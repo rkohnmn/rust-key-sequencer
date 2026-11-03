@@ -2,18 +2,32 @@ name: Build Windows EXE
 
 on:
   push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build-windows:
     runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Formatting
+        run: cargo fmt --all -- --check
+      - name: Strict lint
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Sequence and asset tests (no input injection)
+        run: cargo test --locked
       - name: Build Release EXE
-        run: cargo build --release
+        run: cargo build --locked --release
       - name: Upload Compiled EXE Artifact
         uses: actions/upload-artifact@v4
         with:
           name: rust_key_sequencer_windows_exe
           path: target/release/rust_key_sequencer.exe
+          if-no-files-found: error

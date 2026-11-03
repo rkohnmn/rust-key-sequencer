@@ -14,51 +14,196 @@ use std::time::Duration;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ActionButton {
     // Letters
-    A, B, C, D, E, F, G, H, I, J, K, L, M,
-    N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    G,
+    H,
+    I,
+    J,
+    K,
+    L,
+    M,
+    N,
+    O,
+    P,
+    Q,
+    R,
+    S,
+    T,
+    U,
+    V,
+    W,
+    X,
+    Y,
+    Z,
     // Numbers
-    Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
+    Num0,
+    Num1,
+    Num2,
+    Num3,
+    Num4,
+    Num5,
+    Num6,
+    Num7,
+    Num8,
+    Num9,
     // Function Keys
-    F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
+    F1,
+    F2,
+    F3,
+    F4,
+    F5,
+    F6,
+    F7,
+    F8,
+    F9,
+    F10,
+    F11,
+    F12,
     // Special & Navigation Keys
-    Space, Enter, Tab, Backspace, Escape,
-    Shift, Ctrl, Alt,
-    UpArrow, DownArrow, LeftArrow, RightArrow,
+    Space,
+    Enter,
+    Tab,
+    Backspace,
+    Escape,
+    Shift,
+    Ctrl,
+    Alt,
+    UpArrow,
+    DownArrow,
+    LeftArrow,
+    RightArrow,
     // Mouse Buttons
-    MouseLeft, MouseRight, MouseMiddle,
+    MouseLeft,
+    MouseRight,
+    MouseMiddle,
 }
 
 impl ActionButton {
     pub fn all() -> &'static [ActionButton] {
         use ActionButton::*;
         &[
-            A, B, C, D, E, F, G, H, I, J, K, L, M,
-            N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-            Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
-            F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-            Space, Enter, Tab, Backspace, Escape,
-            Shift, Ctrl, Alt,
-            UpArrow, DownArrow, LeftArrow, RightArrow,
-            MouseLeft, MouseRight, MouseMiddle,
+            A,
+            B,
+            C,
+            D,
+            E,
+            F,
+            G,
+            H,
+            I,
+            J,
+            K,
+            L,
+            M,
+            N,
+            O,
+            P,
+            Q,
+            R,
+            S,
+            T,
+            U,
+            V,
+            W,
+            X,
+            Y,
+            Z,
+            Num0,
+            Num1,
+            Num2,
+            Num3,
+            Num4,
+            Num5,
+            Num6,
+            Num7,
+            Num8,
+            Num9,
+            F1,
+            F2,
+            F3,
+            F4,
+            F5,
+            F6,
+            F7,
+            F8,
+            F9,
+            F10,
+            F11,
+            F12,
+            Space,
+            Enter,
+            Tab,
+            Backspace,
+            Escape,
+            Shift,
+            Ctrl,
+            Alt,
+            UpArrow,
+            DownArrow,
+            LeftArrow,
+            RightArrow,
+            MouseLeft,
+            MouseRight,
+            MouseMiddle,
         ]
     }
 
     pub fn label(&self) -> &'static str {
         use ActionButton::*;
         match self {
-            A => "⌨ Key: A", B => "⌨ Key: B", C => "⌨ Key: C", D => "⌨ Key: D",
-            E => "⌨ Key: E", F => "⌨ Key: F", G => "⌨ Key: G", H => "⌨ Key: H",
-            I => "⌨ Key: I", J => "⌨ Key: J", K => "⌨ Key: K", L => "⌨ Key: L",
-            M => "⌨ Key: M", N => "⌨ Key: N", O => "⌨ Key: O", P => "⌨ Key: P",
-            Q => "⌨ Key: Q", R => "⌨ Key: R", S => "⌨ Key: S", T => "⌨ Key: T",
-            U => "⌨ Key: U", V => "⌨ Key: V", W => "⌨ Key: W", X => "⌨ Key: X",
-            Y => "⌨ Key: Y", Z => "⌨ Key: Z",
-            Num0 => "🔢 Key: 0", Num1 => "🔢 Key: 1", Num2 => "🔢 Key: 2", Num3 => "🔢 Key: 3",
-            Num4 => "🔢 Key: 4", Num5 => "🔢 Key: 5", Num6 => "🔢 Key: 6", Num7 => "🔢 Key: 7",
-            Num8 => "🔢 Key: 8", Num9 => "🔢 Key: 9",
-            F1 => "⚡ Key: F1", F2 => "⚡ Key: F2", F3 => "⚡ Key: F3", F4 => "⚡ Key: F4",
-            F5 => "⚡ Key: F5", F6 => "⚡ Key: F6", F7 => "⚡ Key: F7", F8 => "⚡ Key: F8",
-            F9 => "⚡ Key: F9", F10 => "⚡ Key: F10", F11 => "⚡ Key: F11", F12 => "⚡ Key: F12",
+            A => "⌨ Key: A",
+            B => "⌨ Key: B",
+            C => "⌨ Key: C",
+            D => "⌨ Key: D",
+            E => "⌨ Key: E",
+            F => "⌨ Key: F",
+            G => "⌨ Key: G",
+            H => "⌨ Key: H",
+            I => "⌨ Key: I",
+            J => "⌨ Key: J",
+            K => "⌨ Key: K",
+            L => "⌨ Key: L",
+            M => "⌨ Key: M",
+            N => "⌨ Key: N",
+            O => "⌨ Key: O",
+            P => "⌨ Key: P",
+            Q => "⌨ Key: Q",
+            R => "⌨ Key: R",
+            S => "⌨ Key: S",
+            T => "⌨ Key: T",
+            U => "⌨ Key: U",
+            V => "⌨ Key: V",
+            W => "⌨ Key: W",
+            X => "⌨ Key: X",
+            Y => "⌨ Key: Y",
+            Z => "⌨ Key: Z",
+            Num0 => "🔢 Key: 0",
+            Num1 => "🔢 Key: 1",
+            Num2 => "🔢 Key: 2",
+            Num3 => "🔢 Key: 3",
+            Num4 => "🔢 Key: 4",
+            Num5 => "🔢 Key: 5",
+            Num6 => "🔢 Key: 6",
+            Num7 => "🔢 Key: 7",
+            Num8 => "🔢 Key: 8",
+            Num9 => "🔢 Key: 9",
+            F1 => "⚡ Key: F1",
+            F2 => "⚡ Key: F2",
+            F3 => "⚡ Key: F3",
+            F4 => "⚡ Key: F4",
+            F5 => "⚡ Key: F5",
+            F6 => "⚡ Key: F6",
+            F7 => "⚡ Key: F7",
+            F8 => "⚡ Key: F8",
+            F9 => "⚡ Key: F9",
+            F10 => "⚡ Key: F10",
+            F11 => "⚡ Key: F11",
+            F12 => "⚡ Key: F12",
             Space => "⌨ Space",
             Enter => "⌨ Enter",
             Tab => "⌨ Tab",
@@ -80,19 +225,54 @@ impl ActionButton {
     pub fn short_name(&self) -> &'static str {
         use ActionButton::*;
         match self {
-            A => "A", B => "B", C => "C", D => "D",
-            E => "E", F => "F", G => "G", H => "H",
-            I => "I", J => "J", K => "K", L => "L",
-            M => "M", N => "N", O => "O", P => "P",
-            Q => "Q", R => "R", S => "S", T => "T",
-            U => "U", V => "V", W => "W", X => "X",
-            Y => "Y", Z => "Z",
-            Num0 => "0", Num1 => "1", Num2 => "2", Num3 => "3",
-            Num4 => "4", Num5 => "5", Num6 => "6", Num7 => "7",
-            Num8 => "8", Num9 => "9",
-            F1 => "F1", F2 => "F2", F3 => "F3", F4 => "F4",
-            F5 => "F5", F6 => "F6", F7 => "F7", F8 => "F8",
-            F9 => "F9", F10 => "F10", F11 => "F11", F12 => "F12",
+            A => "A",
+            B => "B",
+            C => "C",
+            D => "D",
+            E => "E",
+            F => "F",
+            G => "G",
+            H => "H",
+            I => "I",
+            J => "J",
+            K => "K",
+            L => "L",
+            M => "M",
+            N => "N",
+            O => "O",
+            P => "P",
+            Q => "Q",
+            R => "R",
+            S => "S",
+            T => "T",
+            U => "U",
+            V => "V",
+            W => "W",
+            X => "X",
+            Y => "Y",
+            Z => "Z",
+            Num0 => "0",
+            Num1 => "1",
+            Num2 => "2",
+            Num3 => "3",
+            Num4 => "4",
+            Num5 => "5",
+            Num6 => "6",
+            Num7 => "7",
+            Num8 => "8",
+            Num9 => "9",
+            F1 => "F1",
+            F2 => "F2",
+            F3 => "F3",
+            F4 => "F4",
+            F5 => "F5",
+            F6 => "F6",
+            F7 => "F7",
+            F8 => "F8",
+            F9 => "F9",
+            F10 => "F10",
+            F11 => "F11",
+            F12 => "F12",
             Space => "Space",
             Enter => "Enter",
             Tab => "Tab",
@@ -114,22 +294,54 @@ impl ActionButton {
     pub fn to_enigo_key(&self) -> Key {
         use ActionButton::*;
         match self {
-            A => Key::Unicode('a'), B => Key::Unicode('b'), C => Key::Unicode('c'),
-            D => Key::Unicode('d'), E => Key::Unicode('e'), F => Key::Unicode('f'),
-            G => Key::Unicode('g'), H => Key::Unicode('h'), I => Key::Unicode('i'),
-            J => Key::Unicode('j'), K => Key::Unicode('k'), L => Key::Unicode('l'),
-            M => Key::Unicode('m'), N => Key::Unicode('n'), O => Key::Unicode('o'),
-            P => Key::Unicode('p'), Q => Key::Unicode('q'), R => Key::Unicode('r'),
-            S => Key::Unicode('s'), T => Key::Unicode('t'), U => Key::Unicode('u'),
-            V => Key::Unicode('v'), W => Key::Unicode('w'), X => Key::Unicode('x'),
-            Y => Key::Unicode('y'), Z => Key::Unicode('z'),
-            Num0 => Key::Unicode('0'), Num1 => Key::Unicode('1'), Num2 => Key::Unicode('2'),
-            Num3 => Key::Unicode('3'), Num4 => Key::Unicode('4'), Num5 => Key::Unicode('5'),
-            Num6 => Key::Unicode('6'), Num7 => Key::Unicode('7'), Num8 => Key::Unicode('8'),
+            A => Key::Unicode('a'),
+            B => Key::Unicode('b'),
+            C => Key::Unicode('c'),
+            D => Key::Unicode('d'),
+            E => Key::Unicode('e'),
+            F => Key::Unicode('f'),
+            G => Key::Unicode('g'),
+            H => Key::Unicode('h'),
+            I => Key::Unicode('i'),
+            J => Key::Unicode('j'),
+            K => Key::Unicode('k'),
+            L => Key::Unicode('l'),
+            M => Key::Unicode('m'),
+            N => Key::Unicode('n'),
+            O => Key::Unicode('o'),
+            P => Key::Unicode('p'),
+            Q => Key::Unicode('q'),
+            R => Key::Unicode('r'),
+            S => Key::Unicode('s'),
+            T => Key::Unicode('t'),
+            U => Key::Unicode('u'),
+            V => Key::Unicode('v'),
+            W => Key::Unicode('w'),
+            X => Key::Unicode('x'),
+            Y => Key::Unicode('y'),
+            Z => Key::Unicode('z'),
+            Num0 => Key::Unicode('0'),
+            Num1 => Key::Unicode('1'),
+            Num2 => Key::Unicode('2'),
+            Num3 => Key::Unicode('3'),
+            Num4 => Key::Unicode('4'),
+            Num5 => Key::Unicode('5'),
+            Num6 => Key::Unicode('6'),
+            Num7 => Key::Unicode('7'),
+            Num8 => Key::Unicode('8'),
             Num9 => Key::Unicode('9'),
-            F1 => Key::F1, F2 => Key::F2, F3 => Key::F3, F4 => Key::F4,
-            F5 => Key::F5, F6 => Key::F6, F7 => Key::F7, F8 => Key::F8,
-            F9 => Key::F9, F10 => Key::F10, F11 => Key::F11, F12 => Key::F12,
+            F1 => Key::F1,
+            F2 => Key::F2,
+            F3 => Key::F3,
+            F4 => Key::F4,
+            F5 => Key::F5,
+            F6 => Key::F6,
+            F7 => Key::F7,
+            F8 => Key::F8,
+            F9 => Key::F9,
+            F10 => Key::F10,
+            F11 => Key::F11,
+            F12 => Key::F12,
             Space => Key::Space,
             Enter => Key::Return,
             Tab => Key::Tab,
@@ -406,7 +618,9 @@ impl Default for KeySequencerApp {
             repeat_count: 1,
             infinite_loop: false,
             is_running: Arc::new(AtomicBool::new(false)),
-            status_text: Arc::new(Mutex::new("Ready. Press START SEQUENCE to begin.".to_string())),
+            status_text: Arc::new(Mutex::new(
+                "Ready. Press START SEQUENCE to begin.".to_string(),
+            )),
             current_step_idx: Arc::new(Mutex::new(None)),
             theme_applied: false,
         }
@@ -418,15 +632,19 @@ impl KeySequencerApp {
         self.steps
             .iter()
             .filter(|s| s.enabled)
-            .map(|s| {
+            .fold(0u64, |total, s| {
                 let hold = if s.mode == PressMode::Click {
-                    s.hold_ms.max(20)
+                    let chord_delay = if !s.modifiers.is_empty() || !s.extra_keys.is_empty() {
+                        30
+                    } else {
+                        0
+                    };
+                    s.hold_ms.max(20).saturating_add(chord_delay)
                 } else {
                     0
                 };
-                hold + s.delay_after_ms
+                total.saturating_add(hold).saturating_add(s.delay_after_ms)
             })
-            .sum()
     }
 
     fn enabled_count(&self) -> usize {
@@ -515,8 +733,7 @@ impl KeySequencerApp {
                     delay_after_ms: 40,
                     enabled: true,
                 }];
-                *self.status_text.lock().unwrap() =
-                    "Loaded 'Rapid Fire Click' preset.".to_string();
+                *self.status_text.lock().unwrap() = "Loaded 'Rapid Fire Click' preset.".to_string();
             }
             "wasd_loop" => {
                 self.steps = vec![
@@ -581,8 +798,7 @@ impl KeySequencerApp {
                         enabled: true,
                     },
                 ];
-                *self.status_text.lock().unwrap() =
-                    "Loaded 'Jump & Attack' preset.".to_string();
+                *self.status_text.lock().unwrap() = "Loaded 'Jump & Attack' preset.".to_string();
             }
             "hold_right_click" => {
                 self.steps = vec![
@@ -642,8 +858,7 @@ impl KeySequencerApp {
             // Countdown phase so user can switch to target window
             for sec in (1..=countdown).rev() {
                 if !is_running.load(Ordering::SeqCst) {
-                    *status_text.lock().unwrap() =
-                        "Sequence stopped during countdown.".to_string();
+                    *status_text.lock().unwrap() = "Sequence stopped during countdown.".to_string();
                     return;
                 }
                 *status_text.lock().unwrap() =
@@ -845,13 +1060,32 @@ fn show_button_selector(
                     .small(),
             );
             for btn in &[
-                ActionButton::A, ActionButton::B, ActionButton::C, ActionButton::D,
-                ActionButton::E, ActionButton::F, ActionButton::G, ActionButton::H,
-                ActionButton::I, ActionButton::J, ActionButton::K, ActionButton::L,
-                ActionButton::M, ActionButton::N, ActionButton::O, ActionButton::P,
-                ActionButton::Q, ActionButton::R, ActionButton::S, ActionButton::T,
-                ActionButton::U, ActionButton::V, ActionButton::W, ActionButton::X,
-                ActionButton::Y, ActionButton::Z,
+                ActionButton::A,
+                ActionButton::B,
+                ActionButton::C,
+                ActionButton::D,
+                ActionButton::E,
+                ActionButton::F,
+                ActionButton::G,
+                ActionButton::H,
+                ActionButton::I,
+                ActionButton::J,
+                ActionButton::K,
+                ActionButton::L,
+                ActionButton::M,
+                ActionButton::N,
+                ActionButton::O,
+                ActionButton::P,
+                ActionButton::Q,
+                ActionButton::R,
+                ActionButton::S,
+                ActionButton::T,
+                ActionButton::U,
+                ActionButton::V,
+                ActionButton::W,
+                ActionButton::X,
+                ActionButton::Y,
+                ActionButton::Z,
             ] {
                 ui.selectable_value(selected, *btn, btn.label());
             }
@@ -863,9 +1097,18 @@ fn show_button_selector(
                     .small(),
             );
             for btn in &[
-                ActionButton::F1, ActionButton::F2, ActionButton::F3, ActionButton::F4,
-                ActionButton::F5, ActionButton::F6, ActionButton::F7, ActionButton::F8,
-                ActionButton::F9, ActionButton::F10, ActionButton::F11, ActionButton::F12,
+                ActionButton::F1,
+                ActionButton::F2,
+                ActionButton::F3,
+                ActionButton::F4,
+                ActionButton::F5,
+                ActionButton::F6,
+                ActionButton::F7,
+                ActionButton::F8,
+                ActionButton::F9,
+                ActionButton::F10,
+                ActionButton::F11,
+                ActionButton::F12,
             ] {
                 ui.selectable_value(selected, *btn, btn.label());
             }
@@ -879,7 +1122,11 @@ fn show_mode_selector(ui: &mut egui::Ui, selected: &mut PressMode, id_salt: impl
         .show_ui(ui, |ui| {
             ui.selectable_value(selected, PressMode::Click, PressMode::Click.label());
             ui.selectable_value(selected, PressMode::PressOnly, PressMode::PressOnly.label());
-            ui.selectable_value(selected, PressMode::ReleaseOnly, PressMode::ReleaseOnly.label());
+            ui.selectable_value(
+                selected,
+                PressMode::ReleaseOnly,
+                PressMode::ReleaseOnly.label(),
+            );
         });
 }
 
@@ -960,13 +1207,17 @@ impl eframe::App for KeySequencerApp {
                     );
                     logo_resp.on_hover_ui(|ui| {
                         ui.add(
-                            egui::Image::new(egui::include_image!("../assets/keytape-logo-dark.svg"))
-                                .fit_to_exact_size(egui::vec2(173.5, 54.0)),
+                            egui::Image::new(egui::include_image!(
+                                "../assets/keytape-logo-dark.svg"
+                            ))
+                            .fit_to_exact_size(egui::vec2(173.5, 54.0)),
                         );
                         ui.label(
-                            egui::RichText::new("Keytape — High-performance Rust Key & Mouse Sequencer")
-                                .small()
-                                .color(egui::Color32::from_rgb(148, 163, 184)),
+                            egui::RichText::new(
+                                "Keytape — High-performance Rust Key & Mouse Sequencer",
+                            )
+                            .small()
+                            .color(egui::Color32::from_rgb(148, 163, 184)),
                         );
                     });
                     ui.add_space(4.0);
@@ -1083,10 +1334,7 @@ impl eframe::App for KeySequencerApp {
                                 .width(160.0)
                                 .show_ui(ui, |ui| {
                                     if ui
-                                        .selectable_label(
-                                            false,
-                                            "⌨ Ctrl + Enter (Send / Submit)",
-                                        )
+                                        .selectable_label(false, "⌨ Ctrl + Enter (Send / Submit)")
                                         .clicked()
                                     {
                                         self.load_preset("ctrl_enter");
@@ -1107,10 +1355,7 @@ impl eframe::App for KeySequencerApp {
                                         self.load_preset("alt_tab");
                                     }
                                     if ui
-                                        .selectable_label(
-                                            false,
-                                            "⚡ Rapid Fire (Left Click Spam)",
-                                        )
+                                        .selectable_label(false, "⚡ Rapid Fire (Left Click Spam)")
                                         .clicked()
                                     {
                                         self.load_preset("rapid_fire");
@@ -1880,6 +2125,58 @@ fn main() -> eframe::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn legacy_sequences_load_without_optional_chord_fields() {
+        let steps: Vec<SequenceStep> = serde_json::from_str(
+            r#"[{"button":"Enter","mode":"Click","hold_ms":1,"delay_after_ms":25,"enabled":true}]"#,
+        )
+        .unwrap();
+        assert!(steps[0].modifiers.is_empty());
+        assert!(steps[0].extra_keys.is_empty());
+        let app = KeySequencerApp {
+            steps,
+            ..Default::default()
+        };
+        assert_eq!(app.total_duration_ms(), 45);
+    }
+
+    #[test]
+    fn chord_roundtrip_preserves_order_and_duration() {
+        let mut app = KeySequencerApp::default();
+        app.load_preset("ctrl_enter");
+        app.steps[0].extra_keys = vec![ActionButton::Shift, ActionButton::A];
+        let serialized = serde_json::to_string(&app.steps).unwrap();
+        app.steps = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(app.steps[0].display_label(), "Ctrl + Enter + Shift + A");
+        assert_eq!(app.total_duration_ms(), 330); // hold + both 15ms chord waits + delay
+        app.steps[0].enabled = false;
+        assert_eq!(app.enabled_count(), 0);
+        assert_eq!(app.total_duration_ms(), 0);
+        app.start_sequence(); // Disabled steps must never initialize an input device.
+        assert!(!app.is_running.load(Ordering::SeqCst));
+        assert!(app.status_text.lock().unwrap().contains("No enabled steps"));
+    }
+
+    #[test]
+    fn hold_preset_has_matching_release_and_ignores_click_hold_time() {
+        let mut app = KeySequencerApp::default();
+        app.load_preset("hold_right_click");
+        assert_eq!(app.steps[0].button, app.steps[1].button);
+        assert_eq!(app.steps[0].mode, PressMode::PressOnly);
+        assert_eq!(app.steps[1].mode, PressMode::ReleaseOnly);
+        app.steps[0].hold_ms = u64::MAX;
+        assert_eq!(app.total_duration_ms(), 2500);
+    }
+
+    #[test]
+    fn oversized_imported_durations_do_not_wrap_or_panic() {
+        let mut app = KeySequencerApp::default();
+        app.load_preset("ctrl_c_ctrl_v");
+        app.steps[0].delay_after_ms = u64::MAX;
+        assert_eq!(app.total_duration_ms(), u64::MAX);
+        assert!(serde_json::from_str::<Vec<SequenceStep>>(r#"[{"button":"Unknown"}]"#).is_err());
+    }
 
     #[test]
     fn test_load_app_icon() {
