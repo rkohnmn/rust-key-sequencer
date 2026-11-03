@@ -934,13 +934,13 @@ fn modifier_toggle(ui: &mut egui::Ui, state: &mut bool, text: &str) -> egui::Res
     let (fill, stroke, text_color) = if active {
         (
             egui::Color32::from_rgb(37, 99, 235),
-            egui::Stroke::new(1.0, egui::Color32::from_rgb(96, 165, 250)),
+            egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(96, 165, 250)),
             egui::Color32::WHITE,
         )
     } else {
         (
             egui::Color32::from_rgb(30, 36, 50),
-            egui::Stroke::new(1.0, egui::Color32::from_rgb(50, 60, 85)),
+            egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(50, 60, 85)),
             egui::Color32::from_rgb(148, 163, 184),
         )
     };
@@ -1144,30 +1144,30 @@ fn setup_custom_theme(ctx: &egui::Context) {
     visuals.extreme_bg_color = egui::Color32::from_rgb(10, 12, 17);
 
     visuals.widgets.noninteractive.bg_fill = bg_card;
-    visuals.widgets.noninteractive.bg_stroke = egui::Stroke::new(1.0, border_subtle);
+    visuals.widgets.noninteractive.bg_stroke = egui::Stroke::new(1.0_f32, border_subtle);
     visuals.widgets.noninteractive.fg_stroke =
-        egui::Stroke::new(1.0, egui::Color32::from_rgb(160, 174, 192));
+        egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(160, 174, 192));
     visuals.widgets.noninteractive.rounding = egui::Rounding::same(6.0);
 
     visuals.widgets.inactive.bg_fill = egui::Color32::from_rgb(30, 37, 52);
-    visuals.widgets.inactive.bg_stroke = egui::Stroke::new(1.0, border_subtle);
+    visuals.widgets.inactive.bg_stroke = egui::Stroke::new(1.0_f32, border_subtle);
     visuals.widgets.inactive.fg_stroke =
-        egui::Stroke::new(1.0, egui::Color32::from_rgb(226, 232, 240));
+        egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(226, 232, 240));
     visuals.widgets.inactive.rounding = egui::Rounding::same(6.0);
 
     visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(42, 53, 76);
     visuals.widgets.hovered.bg_stroke =
-        egui::Stroke::new(1.0, egui::Color32::from_rgb(96, 165, 250));
-    visuals.widgets.hovered.fg_stroke = egui::Stroke::new(1.0, egui::Color32::WHITE);
+        egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(96, 165, 250));
+    visuals.widgets.hovered.fg_stroke = egui::Stroke::new(1.0_f32, egui::Color32::WHITE);
     visuals.widgets.hovered.rounding = egui::Rounding::same(6.0);
 
     visuals.widgets.active.bg_fill = accent_blue;
-    visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0, egui::Color32::WHITE);
-    visuals.widgets.active.fg_stroke = egui::Stroke::new(1.0, egui::Color32::WHITE);
+    visuals.widgets.active.bg_stroke = egui::Stroke::new(1.0_f32, egui::Color32::WHITE);
+    visuals.widgets.active.fg_stroke = egui::Stroke::new(1.0_f32, egui::Color32::WHITE);
     visuals.widgets.active.rounding = egui::Rounding::same(6.0);
 
     visuals.selection.bg_fill = accent_blue;
-    visuals.selection.stroke = egui::Stroke::new(1.0, egui::Color32::WHITE);
+    visuals.selection.stroke = egui::Stroke::new(1.0_f32, egui::Color32::WHITE);
     visuals.window_rounding = egui::Rounding::same(8.0);
 
     ctx.set_visuals(visuals);
@@ -1196,7 +1196,7 @@ impl eframe::App for KeySequencerApp {
                 egui::Frame::default()
                     .fill(egui::Color32::from_rgb(16, 20, 28))
                     .inner_margin(egui::Margin::symmetric(14.0, 9.0))
-                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(38, 45, 62))),
+                    .stroke(egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(38, 45, 62))),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
@@ -1390,7 +1390,7 @@ impl eframe::App for KeySequencerApp {
                 egui::Frame::default()
                     .fill(egui::Color32::from_rgb(16, 20, 28))
                     .inner_margin(egui::Margin::symmetric(14.0, 10.0))
-                    .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(38, 45, 62))),
+                    .stroke(egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(38, 45, 62))),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
@@ -1496,7 +1496,7 @@ impl eframe::App for KeySequencerApp {
             // Section 1: Add a new step
             egui::Frame::group(ui.style())
                 .fill(egui::Color32::from_rgb(22, 27, 38))
-                .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(42, 50, 71)))
+                .stroke(egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(42, 50, 71)))
                 .rounding(egui::Rounding::same(8.0))
                 .inner_margin(egui::Margin::same(10.0))
                 .show(ui, |ui| {
@@ -1586,7 +1586,7 @@ impl eframe::App for KeySequencerApp {
                         egui::Frame::none()
                             .fill(egui::Color32::from_rgb(30, 41, 59))
                             .stroke(egui::Stroke::new(
-                                1.0,
+                                1.0_f32,
                                 egui::Color32::from_rgb(59, 130, 246),
                             ))
                             .rounding(egui::Rounding::same(4.0))
@@ -1727,7 +1727,7 @@ impl eframe::App for KeySequencerApp {
                     ui.add_space(28.0);
                     egui::Frame::group(ui.style())
                         .fill(egui::Color32::from_rgb(20, 24, 34))
-                        .stroke(egui::Stroke::new(1.0, egui::Color32::from_rgb(38, 45, 62)))
+                        .stroke(egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(38, 45, 62)))
                         .rounding(egui::Rounding::same(8.0))
                         .inner_margin(egui::Margin::same(24.0))
                         .show(ui, |ui| {
@@ -1771,17 +1771,17 @@ impl eframe::App for KeySequencerApp {
                             let (fill_color, stroke_color) = if is_active {
                                 (
                                     egui::Color32::from_rgba_unmultiplied(34, 197, 94, 35),
-                                    egui::Stroke::new(1.5, egui::Color32::from_rgb(34, 197, 94)),
+                                    egui::Stroke::new(1.5_f32, egui::Color32::from_rgb(34, 197, 94)),
                                 )
                             } else if is_disabled {
                                 (
                                     egui::Color32::from_rgba_unmultiplied(20, 24, 34, 120),
-                                    egui::Stroke::new(1.0, egui::Color32::from_rgb(38, 44, 60)),
+                                    egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(38, 44, 60)),
                                 )
                             } else {
                                 (
                                     egui::Color32::from_rgb(26, 31, 44),
-                                    egui::Stroke::new(1.0, egui::Color32::from_rgb(45, 54, 76)),
+                                    egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(45, 54, 76)),
                                 )
                             };
 
@@ -1844,7 +1844,7 @@ impl eframe::App for KeySequencerApp {
                                             (
                                                 egui::Color32::from_rgb(22, 101, 52),
                                                 egui::Stroke::new(
-                                                    1.0,
+                                                    1.0_f32,
                                                     egui::Color32::from_rgb(34, 197, 94),
                                                 ),
                                                 egui::Color32::WHITE,
@@ -1853,7 +1853,7 @@ impl eframe::App for KeySequencerApp {
                                             (
                                                 egui::Color32::from_rgb(30, 58, 138),
                                                 egui::Stroke::new(
-                                                    1.0,
+                                                    1.0_f32,
                                                     egui::Color32::from_rgb(59, 130, 246),
                                                 ),
                                                 egui::Color32::from_rgb(191, 219, 254),
@@ -1862,7 +1862,7 @@ impl eframe::App for KeySequencerApp {
                                             (
                                                 egui::Color32::from_rgb(30, 37, 52),
                                                 egui::Stroke::new(
-                                                    1.0,
+                                                    1.0_f32,
                                                     egui::Color32::from_rgb(45, 55, 78),
                                                 ),
                                                 egui::Color32::from_rgb(226, 232, 240),
