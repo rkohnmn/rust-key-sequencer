@@ -1196,7 +1196,10 @@ impl eframe::App for KeySequencerApp {
                 egui::Frame::default()
                     .fill(egui::Color32::from_rgb(16, 20, 28))
                     .inner_margin(egui::Margin::symmetric(14.0, 9.0))
-                    .stroke(egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(38, 45, 62))),
+                    .stroke(egui::Stroke::new(
+                        1.0_f32,
+                        egui::Color32::from_rgb(38, 45, 62),
+                    )),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
@@ -1390,7 +1393,10 @@ impl eframe::App for KeySequencerApp {
                 egui::Frame::default()
                     .fill(egui::Color32::from_rgb(16, 20, 28))
                     .inner_margin(egui::Margin::symmetric(14.0, 10.0))
-                    .stroke(egui::Stroke::new(1.0_f32, egui::Color32::from_rgb(38, 45, 62))),
+                    .stroke(egui::Stroke::new(
+                        1.0_f32,
+                        egui::Color32::from_rgb(38, 45, 62),
+                    )),
             )
             .show(ctx, |ui| {
                 ui.horizontal(|ui| {
