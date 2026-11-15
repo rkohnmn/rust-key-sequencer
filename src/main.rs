@@ -4,6 +4,7 @@ use eframe::egui;
 use enigo::{Button, Direction, Enigo, Key, Keyboard, Mouse, Settings};
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::io::Read;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc, Mutex,
@@ -358,21 +359,12 @@ impl ActionButton {
         }
     }
 
-    pub fn send_direction(&self, enigo: &mut Enigo, dir: Direction) {
+    pub fn send_direction(&self, enigo: &mut Enigo, dir: Direction) -> bool {
         match self {
-            Self::MouseLeft => {
-                let _ = enigo.button(Button::Left, dir);
-            }
-            Self::MouseRight => {
-                let _ = enigo.button(Button::Right, dir);
-            }
-            Self::MouseMiddle => {
-                let _ = enigo.button(Button::Middle, dir);
-            }
-            _ => {
-                let key = self.to_enigo_key();
-                let _ = enigo.key(key, dir);
-            }
+            Self::MouseLeft => enigo.button(Button::Left, dir).is_ok(),
+            Self::MouseRight => enigo.button(Button::Right, dir).is_ok(),
+            Self::MouseMiddle => enigo.button(Button::Middle, dir).is_ok(),
+            _ => enigo.key(self.to_enigo_key(), dir).is_ok(),
         }
     }
 }
@@ -447,103 +439,116 @@ impl SequenceStep {
         parts.join(" + ")
     }
 
-    pub fn execute(&self, enigo: &mut Enigo) {
-        let has_modifiers = !self.modifiers.is_empty();
-        let has_extras = !self.extra_keys.is_empty();
-
+    fn execute(&self, enigo: &mut Enigo, held: &mut HeldInputs, stop: &AtomicBool) -> bool {
+        let mut chord: Vec<SyntheticInput> = Vec::new();
+        if self.modifiers.ctrl { chord.push(SyntheticInput::Action(ActionButton::Ctrl)); }
+        if self.modifiers.shift { chord.push(SyntheticInput::Action(ActionButton::Shift)); }
+        if self.modifiers.alt { chord.push(SyntheticInput::Action(ActionButton::Alt)); }
+        if self.modifiers.win { chord.push(SyntheticInput::Meta); }
+        for button in &self.extra_keys { chord.push(SyntheticInput::Action(*button)); }
+        let main = SyntheticInput::Action(self.button);
         match self.mode {
             PressMode::Click => {
-                // 1. Press modifiers down
-                if self.modifiers.ctrl {
-                    let _ = enigo.key(Key::Control, Direction::Press);
+                for &input in &chord {
+                    if stop.load(Ordering::Acquire) || !held.press(enigo, input) { return false; }
                 }
-                if self.modifiers.shift {
-                    let _ = enigo.key(Key::Shift, Direction::Press);
-                }
-                if self.modifiers.alt {
-                    let _ = enigo.key(Key::Alt, Direction::Press);
-                }
-                if self.modifiers.win {
-                    let _ = enigo.key(Key::Meta, Direction::Press);
-                }
-
-                // 2. Press extra keys down
-                for extra in &self.extra_keys {
-                    extra.send_direction(enigo, Direction::Press);
-                }
-
-                // Small micro-delay for OS input hook registration
-                if has_modifiers || has_extras {
-                    thread::sleep(Duration::from_millis(15));
-                }
-
-                // 3. Press and hold main key
-                self.button.send_direction(enigo, Direction::Press);
-                let hold = self.hold_ms.max(20);
-                thread::sleep(Duration::from_millis(hold));
-                self.button.send_direction(enigo, Direction::Release);
-
-                if has_modifiers || has_extras {
-                    thread::sleep(Duration::from_millis(15));
-                }
-
-                // 4. Release extra keys in reverse
-                for extra in self.extra_keys.iter().rev() {
-                    extra.send_direction(enigo, Direction::Release);
-                }
-
-                // 5. Release modifiers in reverse
-                if self.modifiers.win {
-                    let _ = enigo.key(Key::Meta, Direction::Release);
-                }
-                if self.modifiers.alt {
-                    let _ = enigo.key(Key::Alt, Direction::Release);
-                }
-                if self.modifiers.shift {
-                    let _ = enigo.key(Key::Shift, Direction::Release);
-                }
-                if self.modifiers.ctrl {
-                    let _ = enigo.key(Key::Control, Direction::Release);
+                if !chord.is_empty() && !sleep_cancellable(15, stop) { return false; }
+                if stop.load(Ordering::Acquire) || !held.press(enigo, main) { return false; }
+                if !sleep_cancellable(self.hold_ms.max(20), stop) { return false; }
+                if !held.release(enigo, main) { return false; }
+                if !chord.is_empty() && !sleep_cancellable(15, stop) { return false; }
+                for &input in chord.iter().rev() {
+                    if !held.release(enigo, input) { return false; }
                 }
             }
             PressMode::PressOnly => {
-                if self.modifiers.ctrl {
-                    let _ = enigo.key(Key::Control, Direction::Press);
+                for &input in &chord {
+                    if stop.load(Ordering::Acquire) || !held.press(enigo, input) { return false; }
                 }
-                if self.modifiers.shift {
-                    let _ = enigo.key(Key::Shift, Direction::Press);
-                }
-                if self.modifiers.alt {
-                    let _ = enigo.key(Key::Alt, Direction::Press);
-                }
-                if self.modifiers.win {
-                    let _ = enigo.key(Key::Meta, Direction::Press);
-                }
-                for extra in &self.extra_keys {
-                    extra.send_direction(enigo, Direction::Press);
-                }
-                self.button.send_direction(enigo, Direction::Press);
+                if stop.load(Ordering::Acquire) || !held.press(enigo, main) { return false; }
             }
             PressMode::ReleaseOnly => {
-                self.button.send_direction(enigo, Direction::Release);
-                for extra in self.extra_keys.iter().rev() {
-                    extra.send_direction(enigo, Direction::Release);
-                }
-                if self.modifiers.win {
-                    let _ = enigo.key(Key::Meta, Direction::Release);
-                }
-                if self.modifiers.alt {
-                    let _ = enigo.key(Key::Alt, Direction::Release);
-                }
-                if self.modifiers.shift {
-                    let _ = enigo.key(Key::Shift, Direction::Release);
-                }
-                if self.modifiers.ctrl {
-                    let _ = enigo.key(Key::Control, Direction::Release);
+                if !held.release(enigo, main) { return false; }
+                for &input in chord.iter().rev() {
+                    if !held.release(enigo, input) { return false; }
                 }
             }
         }
+        !stop.load(Ordering::Acquire)
+
     }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum SyntheticInput { Action(ActionButton), Meta }
+impl SyntheticInput {
+    fn send(self, enigo: &mut Enigo, direction: Direction) -> bool {
+        match self {
+            Self::Action(button) => button.send_direction(enigo, direction),
+            Self::Meta => enigo.key(Key::Meta, direction).is_ok(),
+        }
+    }
+}
+
+#[derive(Default)]
+struct HeldInputs { pressed: Vec<SyntheticInput> }
+impl HeldInputs {
+    fn press(&mut self, enigo: &mut Enigo, input: SyntheticInput) -> bool {
+        if self.pressed.contains(&input) { return true; }
+        if !input.send(enigo, Direction::Press) { return false; }
+        self.pressed.push(input);
+        true
+    }
+    fn release(&mut self, enigo: &mut Enigo, input: SyntheticInput) -> bool {
+        if let Some(pos) = self.pressed.iter().position(|&value| value == input) {
+            if !input.send(enigo, Direction::Release) { return false; }
+            self.pressed.remove(pos);
+        }
+        true
+    }
+    fn release_all(&mut self, enigo: &mut Enigo) -> bool {
+        let mut success = true;
+        while let Some(input) = self.pressed.pop() {
+            success &= input.send(enigo, Direction::Release);
+        }
+        success
+    }
+}
+
+fn sleep_cancellable(mut millis: u64, stop: &AtomicBool) -> bool {
+    while millis > 0 {
+        if stop.load(Ordering::Acquire) { return false; }
+        let slice = millis.min(25);
+        thread::sleep(Duration::from_millis(slice));
+        millis -= slice;
+    }
+    !stop.load(Ordering::Acquire)
+}
+
+const MAX_PRESET_BYTES: u64 = 1024 * 1024;
+const MAX_PRESET_STEPS: usize = 1000;
+fn validate_steps(steps: &[SequenceStep]) -> Result<(), &'static str> {
+    if steps.len() > MAX_PRESET_STEPS { return Err("preset exceeds 1000 steps"); }
+    for step in steps {
+        if step.hold_ms > 60_000 || step.delay_after_ms > 300_000 {
+            return Err("preset duration exceeds UI limits");
+        }
+        if step.extra_keys.len() > 8 { return Err("too many companion keys"); }
+    }
+    Ok(())
+}
+fn load_preset_file(path: &std::path::Path) -> Result<Vec<SequenceStep>, String> {
+    let file = fs::File::open(path).map_err(|err| format!("Failed to open preset: {err}"))?;
+    let mut data = String::new();
+    file.take(MAX_PRESET_BYTES + 1).read_to_string(&mut data)
+        .map_err(|err| format!("Failed to read preset: {err}"))?;
+    if data.len() as u64 > MAX_PRESET_BYTES {
+        return Err("Preset exceeds 1 MiB".into());
+    }
+    let steps: Vec<SequenceStep> = serde_json::from_str(&data)
+        .map_err(|err| format!("Failed to parse JSON preset: {err}"))?;
+    validate_steps(&steps).map_err(str::to_owned)?;
+    Ok(steps)
 }
 
 pub struct KeySequencerApp {
@@ -560,6 +565,8 @@ pub struct KeySequencerApp {
     infinite_loop: bool,
 
     is_running: Arc<AtomicBool>,
+    stop_requested: Arc<AtomicBool>,
+    worker: Option<thread::JoinHandle<()>>,
     status_text: Arc<Mutex<String>>,
     current_step_idx: Arc<Mutex<Option<usize>>>,
 
@@ -618,12 +625,21 @@ impl Default for KeySequencerApp {
             repeat_count: 1,
             infinite_loop: false,
             is_running: Arc::new(AtomicBool::new(false)),
+            stop_requested: Arc::new(AtomicBool::new(false)),
+            worker: None,
             status_text: Arc::new(Mutex::new(
                 "Ready. Press START SEQUENCE to begin.".to_string(),
             )),
             current_step_idx: Arc::new(Mutex::new(None)),
             theme_applied: false,
         }
+    }
+}
+
+impl Drop for KeySequencerApp {
+    fn drop(&mut self) {
+        self.stop_requested.store(true, Ordering::Release);
+        if let Some(worker) = self.worker.take() { let _ = worker.join(); }
     }
 }
 
@@ -829,104 +845,88 @@ impl KeySequencerApp {
     }
 
     fn start_sequence(&mut self) {
-        if self.is_running.load(Ordering::SeqCst) {
+        if self.is_running.load(Ordering::Acquire) { return; }
+        if let Some(worker) = self.worker.take() {
+            if worker.join().is_err() {
+                *self.status_text.lock().unwrap() = "Failed: prior macro worker panicked".into();
+                return;
+            }
+        }
+        if let Err(reason) = validate_steps(&self.steps) {
+            *self.status_text.lock().unwrap() = format!("Failed: {reason}");
             return;
         }
-        let active_steps: Vec<(usize, SequenceStep)> = self
-            .steps
-            .iter()
-            .cloned()
-            .enumerate()
-            .filter(|(_, s)| s.enabled)
-            .collect();
-
+        let active_steps: Vec<(usize, SequenceStep)> = self.steps.iter().cloned()
+            .enumerate().filter(|(_, step)| step.enabled).collect();
         if active_steps.is_empty() {
-            *self.status_text.lock().unwrap() =
-                "No enabled steps to run! Enable at least one step.".to_string();
+            *self.status_text.lock().unwrap() = "No enabled steps to run! Enable at least one step.".into();
             return;
         }
-
-        self.is_running.store(true, Ordering::SeqCst);
-        let is_running = Arc::clone(&self.is_running);
-        let status_text = Arc::clone(&self.status_text);
-        let current_step_idx = Arc::clone(&self.current_step_idx);
+        self.stop_requested.store(false, Ordering::Release);
+        self.is_running.store(true, Ordering::Release);
+        let stop = Arc::clone(&self.stop_requested);
+        let running = Arc::clone(&self.is_running);
+        let status = Arc::clone(&self.status_text);
+        let current = Arc::clone(&self.current_step_idx);
         let countdown = self.start_countdown_sec;
         let repeat_count = self.repeat_count;
         let infinite = self.infinite_loop;
-
-        thread::spawn(move || {
-            // Countdown phase so user can switch to target window
+        self.worker = Some(thread::spawn(move || {
             for sec in (1..=countdown).rev() {
-                if !is_running.load(Ordering::SeqCst) {
-                    *status_text.lock().unwrap() = "Sequence stopped during countdown.".to_string();
-                    return;
-                }
-                *status_text.lock().unwrap() =
-                    format!("Starting in {}s... (Switch to your target window)", sec);
-                for _ in 0..10 {
-                    if !is_running.load(Ordering::SeqCst) {
-                        break;
-                    }
-                    thread::sleep(Duration::from_millis(100));
-                }
+                if stop.load(Ordering::Acquire) { break; }
+                *status.lock().unwrap() = format!("Starting in {}s... (Switch to your target window)", sec);
+                if !sleep_cancellable(1000, &stop) { break; }
             }
-
-            let mut enigo = match Enigo::new(&Settings::default()) {
-                Ok(e) => e,
-                Err(err) => {
-                    *status_text.lock().unwrap() =
-                        format!("Failed to initialize input engine: {:?}", err);
-                    is_running.store(false, Ordering::SeqCst);
-                    return;
-                }
-            };
-
-            let mut cycle = 0u32;
-            while is_running.load(Ordering::SeqCst) && (infinite || cycle < repeat_count) {
-                cycle += 1;
-                for (orig_idx, step) in &active_steps {
-                    if !is_running.load(Ordering::SeqCst) {
-                        break;
+            let mut failed = false;
+            let mut held = HeldInputs::default();
+            if !stop.load(Ordering::Acquire) {
+                match Enigo::new(&Settings::default()) {
+                    Ok(mut enigo) => {
+                        let mut cycle = 0u32;
+                        'macro_loop: while !stop.load(Ordering::Acquire) && (infinite || cycle < repeat_count) {
+                            cycle = cycle.saturating_add(1);
+                            for (idx, step) in &active_steps {
+                                if stop.load(Ordering::Acquire) { break 'macro_loop; }
+                                *current.lock().unwrap() = Some(*idx);
+                                let loop_name = if infinite { format!("Cycle {} (Infinite)", cycle) }
+                                    else { format!("Cycle {}/{}", cycle, repeat_count) };
+                                *status.lock().unwrap() = format!("{} • Step #{}: {} ({})",
+                                    loop_name, idx + 1, step.display_label(), step.mode.label());
+                                if !step.execute(&mut enigo, &mut held, &stop) {
+                                    failed = !stop.load(Ordering::Acquire);
+                                    break 'macro_loop;
+                                }
+                                if !sleep_cancellable(step.delay_after_ms, &stop) { break 'macro_loop; }
+                            }
+                        }
+                        if !held.release_all(&mut enigo) {
+                            failed = true;
+                            *status.lock().unwrap() = "Failed: could not release all synthetic keys".into();
+                        }
                     }
-                    *current_step_idx.lock().unwrap() = Some(*orig_idx);
-                    let loop_label = if infinite {
-                        format!("Cycle {} (Infinite)", cycle)
-                    } else {
-                        format!("Cycle {}/{}", cycle, repeat_count)
-                    };
-                    *status_text.lock().unwrap() = format!(
-                        "{} • Step #{}: {} ({})",
-                        loop_label,
-                        orig_idx + 1,
-                        step.display_label(),
-                        step.mode.label()
-                    );
-
-                    step.execute(&mut enigo);
-
-                    // Sleep in 25ms increments for instant Stop responsiveness
-                    let mut remaining = step.delay_after_ms;
-                    while remaining > 0 && is_running.load(Ordering::SeqCst) {
-                        let chunk = remaining.min(25);
-                        thread::sleep(Duration::from_millis(chunk));
-                        remaining -= chunk;
+                    Err(err) => {
+                        failed = true;
+                        *status.lock().unwrap() = format!("Failed to initialize input engine: {err:?}");
                     }
                 }
             }
-
-            *current_step_idx.lock().unwrap() = None;
-            if is_running.load(Ordering::SeqCst) {
-                *status_text.lock().unwrap() = "Sequence completed successfully.".to_string();
-                is_running.store(false, Ordering::SeqCst);
-            } else {
-                *status_text.lock().unwrap() = "Sequence stopped by user.".to_string();
+            *current.lock().unwrap() = None;
+            if !failed {
+                *status.lock().unwrap() = if stop.load(Ordering::Acquire) {
+                    "Sequence stopped by user.".into()
+                } else {
+                    "Sequence completed successfully.".into()
+                };
             }
-        });
+            // Disable Start until the previous worker has completed cleanup.
+            running.store(false, Ordering::Release);
+        }));
     }
 
     fn stop_sequence(&mut self) {
-        self.is_running.store(false, Ordering::SeqCst);
+        self.stop_requested.store(true, Ordering::Release);
     }
+
 }
 
 fn modifier_toggle(ui: &mut egui::Ui, state: &mut bool, text: &str) -> egui::Response {
@@ -1303,28 +1303,14 @@ impl eframe::App for KeySequencerApp {
                                 .add_filter("JSON Preset", &["json"])
                                 .pick_file()
                             {
-                                match fs::read_to_string(&path) {
-                                    Ok(data) => {
-                                        match serde_json::from_str::<Vec<SequenceStep>>(&data) {
-                                            Ok(loaded) => {
-                                                self.steps = loaded;
-                                                *self.status_text.lock().unwrap() = format!(
-                                                    "Loaded {} steps from {}",
-                                                    self.steps.len(),
-                                                    path.file_name()
-                                                        .unwrap_or_default()
-                                                        .to_string_lossy()
-                                                );
-                                            }
-                                            Err(err) => {
-                                                *self.status_text.lock().unwrap() =
-                                                    format!("Failed to parse JSON preset: {}", err);
-                                            }
-                                        }
+                                match load_preset_file(&path) {
+                                    Ok(loaded) => {
+                                        self.steps = loaded;
+                                        *self.status_text.lock().unwrap() = format!("Loaded {} steps from {}",
+                                            self.steps.len(), path.file_name().unwrap_or_default().to_string_lossy());
                                     }
                                     Err(err) => {
-                                        *self.status_text.lock().unwrap() =
-                                            format!("Failed to read preset file: {}", err);
+                                        *self.status_text.lock().unwrap() = err;
                                     }
                                 }
                             }
@@ -2182,6 +2168,32 @@ mod tests {
         app.steps[0].delay_after_ms = u64::MAX;
         assert_eq!(app.total_duration_ms(), u64::MAX);
         assert!(serde_json::from_str::<Vec<SequenceStep>>(r#"[{"button":"Unknown"}]"#).is_err());
+    }
+
+    #[test]
+    fn imported_duration_limits_are_enforced_without_os_input() {
+        let mut app = KeySequencerApp::default();
+        assert!(validate_steps(&app.steps).is_ok());
+        app.steps[0].hold_ms = 60_001;
+        assert!(validate_steps(&app.steps).is_err());
+        app.steps[0].hold_ms = 50;
+        app.steps[0].delay_after_ms = 300_001;
+        assert!(validate_steps(&app.steps).is_err());
+    }
+
+    #[test]
+    fn cancelling_long_sleep_returns_without_waiting() {
+        let stop = AtomicBool::new(true);
+        assert!(!sleep_cancellable(60_000, &stop));
+    }
+
+    #[test]
+    fn stop_does_not_prematurely_clear_running_state() {
+        let mut app = KeySequencerApp::default();
+        app.is_running.store(true, Ordering::Release);
+        app.stop_sequence();
+        assert!(app.stop_requested.load(Ordering::Acquire));
+        assert!(app.is_running.load(Ordering::Acquire));
     }
 
     #[test]
