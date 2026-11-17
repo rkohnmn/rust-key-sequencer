@@ -2208,10 +2208,8 @@ mod tests {
         .unwrap();
         assert!(steps[0].modifiers.is_empty());
         assert!(steps[0].extra_keys.is_empty());
-        let app = KeySequencerApp {
-            steps,
-            ..Default::default()
-        };
+        let mut app = KeySequencerApp::default();
+        app.steps = steps;
         assert_eq!(app.total_duration_ms(), 45);
     }
 
